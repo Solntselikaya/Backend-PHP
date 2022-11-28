@@ -1,7 +1,12 @@
 <?php
+    include_once 'router.php';
+
+    global $dbLink;
+
     function getAdress() {
         $url = rtrim(isset($_GET['q']) ? $_GET['q']: '');
         $str = explode('/', $url);
+        return $str;
     }
 
     function getData() {
@@ -30,14 +35,16 @@
 
     header('Content-type: application/json');
 
-    $link = mysqli_connect("127.0.0.1", "back_guy", "password", "backend");
+    $dbLink = new mysqli("127.0.0.1", "back_guy", "password", "backend");
 
+    /*
     if (!$link) {
         echo "Ошибка: Невозможно установить соединение с MySQL." . PHP_EOL;
         echo "Код ошибки errno: " . mysqli_connect_errno() . PHP_EOL;
         echo "Текст ошибки error: " . mysqli_connect_error() . PHP_EOL;
         exit;
     }
+    */
 
     //echo "Соединение с MySQL установлено!" . PHP_EOL;
     //echo "Информация о сервере: " . mysqli_get_host_info($link) . PHP_EOL;
@@ -66,7 +73,13 @@
     */
 
     //echo json_encode($_GET);
-    getAdress();
-    echo json_encode(getData());
+    $adress = getAdress();
+    $data = getData();
+
+    route(
+        $_SERVER['REQUEST_METHOD'],
+        $adress,
+        $data
+    );
 
 ?>

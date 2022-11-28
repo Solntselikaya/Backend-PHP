@@ -1,17 +1,12 @@
 <?php
+
+    include_once 'userController.php';
+
+    // $method - get, post, delete etc.
     function route($method, $url, $data) {
-        switch ($method) {
-            case 'GET': 
-                echo 'GET';
-                break;
-            case 'PUT': 
-                echo 'PUT';
-                break;
-            case 'POST': 
-                echo 'POST';
-                break;
-            case 'DELETE': 
-                echo 'DELETE';
+        switch ($url[1]) {
+            case 'account':
+                userResponse($method, array_slice($url, 2), $data);
                 break;
             default:
                 echo 'no such method baka';
