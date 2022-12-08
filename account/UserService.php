@@ -1,5 +1,5 @@
 <?php
-    include_once 'UserRegisterModel.php';
+    include_once 'models/UserRegisterModel.php';
 
     class UserService {
         public static function register($data) {
