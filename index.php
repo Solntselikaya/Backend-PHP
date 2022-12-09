@@ -1,49 +1,55 @@
 <?php
-    include_once 'router.php';
 
-    global $dbLink;
+include_once 'router.php';
+include_once 'helpers/headers.php';
 
-    function getAdress() {
-        $url = rtrim(isset($_GET['q']) ? $_GET['q']: '');
-        $str = explode('/', $url);
-        return $str;
-    }
+global $dbLink;
 
-    function getData() {
-        $data = new stdClass();
-        $data->body = json_decode(file_get_contents('php://input'));
-        $params = explode('&',$_SERVER['QUERY_STRING']);
-        $data->params = [];
+function getAdress() {
+    $url = rtrim(isset($_GET['q']) ? $_GET['q']: '');
+    $str = explode('/', $url);
+    return $str;
+}
 
-        $uwu = [];
-        foreach ($params as $key => $value) {
-            $dev = explode('=', $value);
-            if (!isset($uwu[$dev[0]])) {
-                $uwu[$dev[0]] = [];
-            }
-            array_push($uwu[$dev[0]], $dev[1]);
+function getData() {
+    $data = new stdClass();
+    $data->body = json_decode(file_get_contents('php://input'));
+    $params = explode('&',$_SERVER['QUERY_STRING']);
+    $data->params = [];
+
+    $uwu = [];
+    foreach ($params as $key => $value) {
+        $dev = explode('=', $value);
+        if (!isset($uwu[$dev[0]])) {
+            $uwu[$dev[0]] = [];
         }
-        foreach ($uwu as $key => $value) {
-            if (count($value) == 1) {
-                $data->params[$key] = $value[0];
-                continue;
-            }
-            $data->params[$key] = $value;
-        }
-        return $data;
+        array_push($uwu[$dev[0]], $dev[1]);
     }
+    foreach ($uwu as $key => $value) {
+        if (count($value) == 1) {
+            $data->params[$key] = $value[0];
+            continue;
+        }
+        $data->params[$key] = $value;
+    }
+    return $data;
+}
 
-    header('Content-type: application/json');
+header('Content-type: application/json');
 
-    $dbLink = new mysqli("127.0.0.1", "back_guy", "password", "backend");
+$dbLink = new mysqli("127.0.0.1", "back_guy", "password", "backend");
+if (!$dbLink) {
+    setHTTPStatus(500, "DB Connection error: ".mysqli_connect_error());
+    exit;
+}
 
-    $adress = getAdress();
-    $data = getData();
+$adress = getAdress();
+$data = getData();
 
-    route(
-        $_SERVER['REQUEST_METHOD'],
-        $adress,
-        $data
-    );
+route(
+    $_SERVER['REQUEST_METHOD'],
+    $adress,
+    $data
+);
 
 ?>
