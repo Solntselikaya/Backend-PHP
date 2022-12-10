@@ -37,6 +37,12 @@ function setHTTPStatus($statusNum = 200, $message = null, $errors = null) {
         //$responseBody = new TokenResponse($message);
         echo json_encode(['token' => $message]);
     }
+    else if (!is_null($message) && $statusNum != 200) {
+        echo json_encode([
+            'status' => $statusNum,
+            'message' => $message
+        ]);
+    }
     else if (!is_null($errors)){
         /* $responseBody = new Response([
             'status' => $statusNum,
@@ -48,12 +54,6 @@ function setHTTPStatus($statusNum = 200, $message = null, $errors = null) {
             'status' => $statusNum,
             'message' => $message,
             'errors' => $errors
-        ]);
-    }
-    else {
-        echo json_encode([
-            'status' => $statusNum,
-            'message' => $message
         ]);
     }
 

@@ -11,8 +11,10 @@ function userResponse($method, $url, $data) {
                     UserService::register($data);
                     break;
                 case 'login':
+                    UserService::login($data);
                     break;
                 case 'logout':
+                    UserService::logout($data);
                     break;
                 default:
                     setHTTPStatus(404, "There is no such path");

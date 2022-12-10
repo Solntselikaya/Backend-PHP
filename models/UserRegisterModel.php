@@ -42,9 +42,10 @@ class UserRegisterModel {
         $this->fullName = $name;
     }
 
-    //в пароле должна быть хотя бы одна циферка...
-    //надо добавить в проверку
     private function setPassword($password) {
+        if (!preg_match('~[0-9]+~', $password)) {
+            $this->errors['Password'] = "Password requires at least one digit.";
+        }
         if (strlen($password) < 6) {
             //throw new Exception('Wrong password');
             $this->errors['Password'] = "Password is too short.";
