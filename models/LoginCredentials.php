@@ -15,7 +15,8 @@ class LoginCredentials {
     private function setEmail($email) {
         $emailExists = $GLOBALS['dbLink']->query("SELECT email FROM users WHERE email = '$email'")->fetch_assoc();
         if (is_null($emailExists)) {
-            setHTTPStatus(400, "No user with email '$email'.");
+            $response = new Response(400,"No user with email '$email'");
+            setHTTPStatus(400, $response);
             exit;
         }
         $this->email = $email;
@@ -25,12 +26,14 @@ class LoginCredentials {
         $password = hash('sha1', $password);
         $passwordExists = $GLOBALS['dbLink']->query("SELECT password FROM users WHERE email = '$this->email'")->fetch_assoc();
         if (is_null($passwordExists)) {
-            setHTTPStatus(400, "Login failed.");
+            $response = new Response(400, "Login failed");
+            setHTTPStatus(400, $response);
             exit;
         }
 
         if ($passwordExists['password'] != $password) {
-            setHTTPStatus(400, "Wrong password.");
+            $response = new Response(400, "Wrong password");
+            setHTTPStatus(400, $response);
             exit;
         }
 
@@ -39,7 +42,8 @@ class LoginCredentials {
 
     public function login() {
         $jwt = getToken($this->email);
-        setHTTPStatus(200, $jwt);
+        $response = new TokenResponse($jwt);
+        setHTTPStatus(200, $response);
     }
 }
 ?>

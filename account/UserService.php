@@ -2,6 +2,9 @@
 
 include_once 'models/UserRegisterModel.php';
 include_once 'models/LoginCredentials.php';
+include_once 'models/UserDto.php';
+include_once 'models/UserEditModel.php';
+include_once 'models/Response.php';
 include_once 'helpers/token.php';
 
 class UserService {
@@ -16,27 +19,32 @@ class UserService {
     }
 
     public static function logout() {
-        $authList = explode(' ', getallheaders()['Authorization']);
-        $token = $authList[1];
+        $token = explode(' ', getallheaders()['Authorization'])[1];
 
-        if (!isTokenExist($token)) {
-            setHTTPStatus(401, 'Invalid token.');
-            exit;
-        }
-
-        if (isTokenInBlackList($token)) {
-            setHTTPStatus(401, 'User is unauthorized.');
-            exit;
-        }
-
-        if(!isTokenAlive($token)) {
-            setHTTPStatus(401, 'Token has been expired.');
-            addTokenToBlackList($token);
-            exit;
-        }
+        checkBearerToken($token);
 
         addTokenToBlackList($token);
-        setHTTPStatus(200);
+
+        $response = new Response(null, "Logged Out");
+        setHTTPStatus(200, $response);
+    }
+
+    public static function getProfile() {
+        $token = explode(' ', getallheaders()['Authorization'])[1];
+
+        checkBearerToken($token);
+
+        $user = new UserDto($token);
+        $user->getUserInfo();
+    }
+
+    public static function updateProfile($data) {
+        $token = explode(' ', getallheaders()['Authorization'])[1];
+
+        checkBearerToken($token);
+
+        $editUser = new UserEditModel($data->body);
+        $editUser->saveChanges($token);
     }
 }
 

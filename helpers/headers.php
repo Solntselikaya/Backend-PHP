@@ -4,10 +4,10 @@
     Вспомогательные функции для формирования HTTP-статусов 
 */
 
-//include_once 'models/TokenResponse.php';
-//include_once 'models/Response.php';
+include_once 'models/Response.php';
+include_once 'models/TokenResponse.php';
 
-function setHTTPStatus($statusNum = 200, $message = null, $errors = null) {
+function setHTTPStatus($statusNum = 200, $responseBody = null) {
 
     switch ($statusNum) {
         default:
@@ -33,9 +33,16 @@ function setHTTPStatus($statusNum = 200, $message = null, $errors = null) {
 
     header($status);
 
+    /*
     if (!is_null($message) && $statusNum == 200) {
-        //$responseBody = new TokenResponse($message);
         echo json_encode(['token' => $message]);
+    }
+    else if (!is_null($errors)){
+        echo json_encode([
+            'status' => $statusNum,
+            'message' => $message,
+            'errors' => $errors
+        ]);
     }
     else if (!is_null($message) && $statusNum != 200) {
         echo json_encode([
@@ -43,21 +50,12 @@ function setHTTPStatus($statusNum = 200, $message = null, $errors = null) {
             'message' => $message
         ]);
     }
-    else if (!is_null($errors)){
-        /* $responseBody = new Response([
-            'status' => $statusNum,
-            'message' => $message,
-            'errors' => $errors
-        ]); */
+    */
 
-        echo json_encode([
-            'status' => $statusNum,
-            'message' => $message,
-            'errors' => $errors
-        ]);
+    if (!is_null($responseBody)) {
+        $responseBody->echoContents();
     }
 
-    //var_dump($responseBody);
 }
 
 ?>

@@ -2,6 +2,7 @@
 
 include_once 'account/userController.php';
 include_once 'helpers/headers.php';
+include_once 'models/Response.php';
 
 // $method - get, post, delete etc.
 function route($method, $url, $data) {
@@ -10,7 +11,8 @@ function route($method, $url, $data) {
             userResponse($method, array_slice($url, 2), $data);
             break;
         default:
-            setHTTPStatus(404, "There is no such path as /$url[1]");
+            $response = new Response(404, "There is no such path as /$url[1]");
+            setHTTPStatus(404, $response);
             break;
     }
 }

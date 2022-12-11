@@ -39,7 +39,8 @@ header('Content-type: application/json');
 
 $dbLink = new mysqli("127.0.0.1", "back_guy", "password", "backend");
 if (!$dbLink) {
-    setHTTPStatus(500, "DB Connection error: ".mysqli_connect_error());
+    $response = new Response(404, "DB Connection error: ".mysqli_connect_error());
+    setHTTPStatus(500, $response);
     exit;
 }
 

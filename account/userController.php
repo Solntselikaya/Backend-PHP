@@ -14,16 +14,39 @@ function userResponse($method, $url, $data) {
                     UserService::login($data);
                     break;
                 case 'logout':
-                    UserService::logout($data);
+                    UserService::logout();
                     break;
                 default:
-                    setHTTPStatus(404, "There is no such path");
+                    $response = new Response(404, "There is no such path as /$url[0]");
+                    setHTTPStatus(404, $response);
                     break;
             }
             break;
         case 'GET':
+            switch($url[0]) {
+                case 'profile':
+                    UserService::getProfile();
+                    break;
+                default:
+                    $response = new Response(404, "There is no such path as /$url[0]");
+                    setHTTPStatus(404, $response);
+                    break;
+            }
             break;
         case 'PUT':
+            switch ($url[0]) {
+                case 'profile':
+                    UserService::updateProfile($data);
+                    break;
+                default:
+                $response = new Response(404, "There is no such path as /$url[0]");
+                setHTTPStatus(404, $response);
+                break;
+            }
+            break;
+        default:
+            $response = new Response(404, "There is no such method as $method");
+            setHTTPStatus(404, $response);
             break;
     }
 }

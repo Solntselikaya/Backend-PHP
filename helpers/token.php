@@ -1,4 +1,9 @@
 <?php
+
+/*
+    Вспомогательные функции для работы с токенами 
+*/
+
 function createToken($userEmail): string {
 
     $header = json_encode([
@@ -25,8 +30,6 @@ function createToken($userEmail): string {
     $base64UrlSignature = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($signature));
 
     $jwt = $base64UrlHeader . "." . $base64UrlPayload . "." . $base64UrlSignature;
-
-    //echo $jwt;
 
     return $jwt;
 }
@@ -105,7 +108,7 @@ function getToken($userEmail): string {
         return $token;
     }
 
-    addTokenToBlackList($token);    
+    $GLOBALS['dbLink']->query("DELETE FROM blackList WHERE token = '$token'");
     return createToken($userEmail);
 }
 
@@ -116,8 +119,26 @@ function addTokenToBlackList($token) {
     $GLOBALS['dbLink']->query("INSERT blackList (email, token) values ('$userEmail', '$token')");
 }
 
-function deleteTokenFromBlackList($token) {
-    
+function checkBearerToken($token) {
+
+    if (!isTokenExist($token)) {
+        $response = new Response(401, "Invalid token");
+        setHTTPStatus(401, $response);
+        exit;
+    }
+
+    if (isTokenInBlackList($token)) {
+        $response = new Response(401, "User is unauthorized");
+        setHTTPStatus(401, $response);
+        exit;
+    }
+
+    if(!isTokenAlive($token)) {
+        $response = new Response(401, "Token expired");
+        setHTTPStatus(401, $response);
+        addTokenToBlackList($token);
+        exit;
+    }
 }
 
 ?>
