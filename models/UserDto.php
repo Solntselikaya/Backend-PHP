@@ -30,22 +30,5 @@ class UserDto extends BasicDto {
         $this->email = $info['email'];
         $this->phoneNumber = $info['phoneNumber'];
     }
-
-    /*
-    public function getUserInfo() {
-        
-        setHTTPStatus(200);
-        echo json_encode([
-            'id' => $this->id,
-            'fullName' => $this->fullName,
-            'birthDate' => $this->birthDate,
-            'gender' => $this->gender,
-            'address' => $this->address,
-            'email' => $this->email,
-            'phoneNumber' => $this->phoneNumber
-        ]);
-    }
-    */
-
 }
 ?>
