@@ -2,15 +2,16 @@
 
 include_once 'helpers/token.php';
 include_once 'helpers/headers.php';
+include_once 'models/BasicDto.php';
 
-class UserDto {
-    private $id;
-    private $fullName;
-    private $birthDate;
-    private $gender;
-    private $address;
-    private $email;
-    private $phoneNumber;
+class UserDto extends BasicDto {
+    protected $id;
+    protected $fullName;
+    protected $birthDate;
+    protected $gender;
+    protected $address;
+    protected $email;
+    protected $phoneNumber;
 
     public function __construct($token) {
         $userEmail = getEmailFromToken($token);
@@ -30,6 +31,7 @@ class UserDto {
         $this->phoneNumber = $info['phoneNumber'];
     }
 
+    /*
     public function getUserInfo() {
         
         setHTTPStatus(200);
@@ -43,6 +45,7 @@ class UserDto {
             'phoneNumber' => $this->phoneNumber
         ]);
     }
+    */
 
 }
 ?>

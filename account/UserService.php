@@ -35,7 +35,7 @@ class UserService {
         checkBearerToken($token);
 
         $user = new UserDto($token);
-        $user->getUserInfo();
+        $user->echoContents();
     }
 
     public static function updateProfile($data) {

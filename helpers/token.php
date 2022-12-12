@@ -17,7 +17,7 @@ function createToken($userEmail): string {
         'iss' => "http://localhost/",
         'aud' => "http://localhost/",
         'nbf' => $currDateTime->getTimeStamp(),
-        'exp' => $currDateTime->getTimeStamp() + 1800,
+        'exp' => $currDateTime->getTimeStamp() + 3600,
         'iat' => $currDateTime->getTimeStamp()
     ]);
 

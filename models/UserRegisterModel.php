@@ -1,6 +1,7 @@
 <?php
 include_once 'helpers/headers.php';
 include_once 'helpers/token.php';
+include_once 'models/Gender.php';
 
 class UserRegisterModel {
     private $fullName;
@@ -21,15 +22,8 @@ class UserRegisterModel {
         $this->setGender($data->gender);
         $this->phoneNumber = isset($data->phoneNumber) ? $this->setPhoneNumber($data->phoneNumber) : null;
 
-        $err = array();
-        foreach ($this->errors as $key => $value) {
-            if ($value) {
-                $err[$key] = $value;
-            }
-        }
-
-        if($err) {
-            $response = new Response(400, "One or more validation errors occured", $err);
+        if($this->errors) {
+            $response = new Response(400, "One or more validation errors occured", $this->errors);
             setHTTPStatus(400, $response);
             exit;
         }
@@ -37,19 +31,17 @@ class UserRegisterModel {
 
     private function setName($name) {
         if (strlen($name) < 1) {
-            //throw new Exception('Name is too short');
-            $this->errors['Name'] = "Name is too short.";
+            $this->errors['Name'] = "Name is too short";
         }
         $this->fullName = $name;
     }
 
     private function setPassword($password) {
         if (!preg_match('~[0-9]+~', $password)) {
-            $this->errors['Password'] = "Password requires at least one digit.";
+            $this->errors['Password'] = "Password requires at least one digit";
         }
         if (strlen($password) < 6) {
-            //throw new Exception('Wrong password');
-            $this->errors['Password'] = "Password is too short.";
+            $this->errors['Password'] = "Password is too short";
         }
         $this->password = hash('sha1', $password);
     }
@@ -57,11 +49,10 @@ class UserRegisterModel {
     private function setEmail($email) {
         $emailExists = $GLOBALS['dbLink']->query("SELECT email FROM users WHERE email = '$email'")->fetch_assoc();
         if (!is_null($emailExists)) {
-            //throw new Exception('Wrong email');
-            $this->errors['DuplicateEmail'] = "Email '$email' is already used.";
+            $this->errors['DuplicateEmail'] = "Email '$email' is already used";
         }
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $this->errors['Email'] = "The Email field is not a valid e-mail address.";
+            $this->errors['Email'] = "The Email field is not a valid e-mail address";
         }
         $this->email = $email;
     }
@@ -78,8 +69,7 @@ class UserRegisterModel {
     }
 
     private function setGender($gender) {
-        if ($gender != 'Male' && $gender != 'Female') {
-            //throw new Exception('Wrong gender');
+        if (!Gender::checkGender($gender)) {
             $this->errors['Gender'] = "Wrong gender.";
         }
         $this->gender = $gender;
@@ -88,7 +78,6 @@ class UserRegisterModel {
     private function setPhoneNumber($phoneNumber): string {
         $pattern = '/^\+[7]\ \([0-9]{3}\)\ [0-9]{3}-[0-9]{2}-[0-9]{2}$/';
         if (!preg_match($pattern, $phoneNumber)) {
-            //throw new Exception('Wrong phone number');
             $this->errors['PhoneNumber'] = "The PhoneNumber field is not a valid phone number.";
             return null;
         }

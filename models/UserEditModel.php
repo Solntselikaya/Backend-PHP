@@ -1,6 +1,7 @@
 <?php
 
 include_once 'helpers/token.php';
+include_once 'models/Gender.php';
 
 class UserEditModel {
     private $fullName;
@@ -16,16 +17,9 @@ class UserEditModel {
         $this->setGender($data->gender);
         $this->address = isset($data->address) ? $data->address : null;
         $this->phoneNumber = isset($data->phoneNumber) ? $this->setPhoneNumber($data->phoneNumber) : null;
-    
-        $err = array();
-        foreach ($this->errors as $key => $value) {
-            if ($value) {
-                $err[$key] = $value;
-            }
-        }
 
-        if($err) {
-            $response = new Response(400, "One or more validation errors occured", $err);
+        if($this->errors) {
+            $response = new Response(400, "One or more validation errors occured", $this->errors);
             setHTTPStatus(400, $response);
             exit;
         }
@@ -33,7 +27,6 @@ class UserEditModel {
 
     private function setName($name) {
         if (strlen($name) < 1) {
-            //throw new Exception('Name is too short');
             $this->errors['Name'] = "Name is too short.";
         }
         $this->fullName = $name;
@@ -51,8 +44,7 @@ class UserEditModel {
     }
 
     private function setGender($gender) {
-        if ($gender != 'Male' && $gender != 'Female') {
-            //throw new Exception('Wrong gender');
+        if (!Gender::checkGender($gender)) {
             $this->errors['Gender'] = "Wrong gender.";
         }
         $this->gender = $gender;
@@ -61,7 +53,6 @@ class UserEditModel {
     private function setPhoneNumber($phoneNumber): string {
         $pattern = '/^\+[7]\ \([0-9]{3}\)\ [0-9]{3}-[0-9]{2}-[0-9]{2}$/';
         if (!preg_match($pattern, $phoneNumber)) {
-            //throw new Exception('Wrong phone number');
             $this->errors['PhoneNumber'] = "The PhoneNumber field is not a valid phone number.";
             return null;
         }
