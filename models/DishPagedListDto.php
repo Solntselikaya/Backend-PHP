@@ -81,6 +81,16 @@ class DishPagedListDto extends BasicDto {
 
         if (isset($params['categories']) || !empty($params['categories'])) {
             
+            if (!is_array($params['categories'])) {
+                $isCategoryValid = Categories::checkCategories($params['categories']);
+                if (!$isCategoryValid) {
+                    $c = $params['categories'];
+                    $response = new Response(400, "There is no such category as '$c'");
+                    setHTTPStatus(400, $response);
+                    exit;
+                }
+            }
+            
             foreach ($params['categories'] as $key => $value) {
                 $isCategoryValid = Categories::checkCategories($value);
                 if (!$isCategoryValid) {
