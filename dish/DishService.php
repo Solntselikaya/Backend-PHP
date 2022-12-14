@@ -46,6 +46,12 @@ class DishService {
     public static function setDishRating($dishId, $ratingScore) {
         $userId = getUserIdFromToken();
 
+        if(empty($ratingScore)) {
+            $response = new Response(400, "Rating score not assigned");
+            setHTTPStatus(400, $response);
+            exit;
+        }
+
         $isDishOrdered = $GLOBALS['dbLink']->query(
             "SELECT dishId FROM userOrderedDishes WHERE userId = '$userId'"
         )->num_rows;
@@ -53,6 +59,7 @@ class DishService {
         if (!$isDishOrdered) {
             $response = new Response(403, "User with id: '$userId' haven't ordered dish with id: '$dishId'");
             setHTTPStatus(403, $response);
+            exit;
         }
 
         $ratingScore = intval($ratingScore);
