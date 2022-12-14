@@ -70,6 +70,16 @@ function getEmailFromToken($token): string {
     return $decodedPayload->email;
 }
 
+function getUserIdFromToken(): string {
+    $token = explode(' ', getallheaders()['Authorization'])[1];
+    checkBearerToken($token);
+
+    $userEmail = getEmailFromToken($token);
+    $userId = $GLOBALS['dbLink']->query("SELECT id FROM users WHERE email = '$userEmail'")->fetch_assoc();
+
+    return $userId['id'];
+}
+
 function isTokenAlive($token): bool {
 
     $tokenList = explode('.', $token);

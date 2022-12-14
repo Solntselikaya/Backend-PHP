@@ -7,6 +7,8 @@ global $dbLink;
 global $UUID_REGEX;
 $UUID_REGEX = "/[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}/";
 
+date_default_timezone_set('Asia/Novosibirsk');
+
 function getAdress() {
     $url = rtrim(isset($_GET['q']) ? $_GET['q']: '');
     $str = explode('/', $url);

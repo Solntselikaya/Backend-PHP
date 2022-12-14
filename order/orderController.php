@@ -1,13 +1,13 @@
 <?php
 
-include_once 'UserService.php';
+include_once 'OrderService.php';
 include_once 'helpers/headers.php';
 
 function orderResponse($method, $url, $data) {
     switch ($method) {
         case 'POST':
             if (empty($url)) {
-                //creating the order from dishes
+                OrderService::createOrder($data);
                 exit;;
             }
             if (!preg_match($GLOBALS['UUID_REGEX'], $url[0])) {
@@ -20,11 +20,11 @@ function orderResponse($method, $url, $data) {
                 setHTTPStatus(404, $response);
                 exit;
             }
-            //confirm order status
+            OrderService::confirmOrderDelivery($url[0]);
             break;
         case 'GET':
             if (empty($url)) {
-                //get list of orders
+                OrderService::getListOfOrders();
                 exit;;
             }
             if (!preg_match($GLOBALS['UUID_REGEX'], $url[0])) {
@@ -32,7 +32,7 @@ function orderResponse($method, $url, $data) {
                 setHTTPStatus(404, $response);
                 exit;
             }
-            //info about concrete order
+            OrderService::getOrderInfo($url[0]);
             break;
         default:
             $response = new Response(404, "There is no such method as $method");
