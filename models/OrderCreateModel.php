@@ -2,7 +2,7 @@
 
 include_once 'helpers/headers.php';
 include_once 'models/Response.php';
-include_once 'models/Response.php';
+
 class OrderCreateModel {
     private $deliveryTime;
     private $address;
@@ -49,6 +49,12 @@ class OrderCreateModel {
         $basket = $GLOBALS['dbLink']->query(
             "SELECT dishId, amount FROM basket WHERE userId = '$userId'"
         )->fetch_all(MYSQLI_ASSOC);
+
+        if (empty($basket)) {
+            $response = new Response(400, "Basket is empty");
+            setHTTPStatus(400, $response);
+            exit;
+        }
         
         $orderUUID = (new UUID)->getUUID();
         $GLOBALS['dbLink']->query(
@@ -90,7 +96,7 @@ class OrderCreateModel {
             "DELETE FROM basket WHERE userId = '$userId'"
         );
 
-        $response = new Response(200, "Order succesfully created");
+        $response = new Response(null, "Order succesfully created");
         setHTTPStatus(200, $response);
     }
 }

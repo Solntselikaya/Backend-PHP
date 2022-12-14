@@ -13,10 +13,10 @@ class UserEditModel {
 
     public function __construct($data) {
         $this->setName($data->fullName);
-        $this->birthDate = isset($data->birthDate) ? $this->setBirthDate($data->birthDate) : null;
+        $this->birthDate = $this->setBirthDate($data->birthDate);
         $this->setGender($data->gender);
-        $this->address = isset($data->address) ? $data->address : null;
-        $this->phoneNumber = isset($data->phoneNumber) ? $this->setPhoneNumber($data->phoneNumber) : null;
+        $this->address = empty($data->address) ? 'NULL' : "'$data->address'";
+        $this->phoneNumber = $this->setPhoneNumber($data->phoneNumber);
 
         if($this->errors) {
             $response = new Response(400, "One or more validation errors occured", $this->errors);
@@ -26,39 +26,55 @@ class UserEditModel {
     }
 
     private function setName($name) {
-        if (strlen($name) < 1) {
-            $this->errors['Name'] = "Name is too short.";
+        if (empty($name)) {
+            $this->errors['Name'] = "The FullName field is required";
         }
+        else if (strlen($name) < 1) {
+            $this->errors['Name'] = "Name is too short";
+        }
+
         $this->fullName = $name;
     }
 
-    private function setBirthDate($birthDate): string {
+    private function setBirthDate($birthDate) {
+        if (empty($birthDate)) {
+            return 'NULL';
+        }
+        
         $formattedBirthDate = DateTime::createFromFormat('Y-m-d', $birthDate);
         if (!$formattedBirthDate) {
             $this->errors['BirthDate'] = "Invalid birthDate";
-            return null;
+            return 'NULL';
         }
-        else {
-            return $formattedBirthDate->format('Y-m-d');
-        }
+
+        $formBirthDate = $formattedBirthDate->format('Y-m-d');
+        return "'$formBirthDate'";
     }
 
     private function setGender($gender) {
-        if (!Gender::checkGender($gender)) {
-            $this->errors['Gender'] = "Wrong gender.";
+        if (empty($gender)) {
+            $this->errors['Gender'] = "The Gender field is required";
         }
-        $this->gender = $gender;
-    }
-
-    private function setPhoneNumber($phoneNumber): string {
-        $pattern = '/^\+[7]\ \([0-9]{3}\)\ [0-9]{3}-[0-9]{2}-[0-9]{2}$/';
-        if (!preg_match($pattern, $phoneNumber)) {
-            $this->errors['PhoneNumber'] = "The PhoneNumber field is not a valid phone number.";
-            return null;
+        if (!Gender::checkGender($gender)) {
+            $this->errors['Gender'] = "Wrong gender";
         }
         else {
-            return $phoneNumber;
+            $this->gender = $gender;
         }
+    }
+
+    private function setPhoneNumber($phoneNumber) {
+        if (empty($phoneNumber)) {
+            return 'NULL';
+        }
+
+        $pattern = '/^\+[7]\ \([0-9]{3}\)\ [0-9]{3}-[0-9]{2}-[0-9]{2}$/';
+        if (!preg_match($pattern, $phoneNumber)) {
+            $this->errors['PhoneNumber'] = "The PhoneNumber field is not a valid phone number";
+            return 'NULL';
+        }
+
+        return "'$phoneNumber'";
     }
 
     public function saveChanges($token) {
@@ -68,10 +84,10 @@ class UserEditModel {
             "UPDATE users 
             SET 
             fullName = '$this->fullName', 
-            birthDate = '$this->birthDate',
+            birthDate = " . $this->birthDate . ",
             gender = '$this->gender',
-            address = '$this->address', 
-            phoneNumber = '$this->phoneNumber'
+            address = " . $this->address . ", 
+            phoneNumber = " . $this->phoneNumber . "
             WHERE email = '$userEmail'"
         );
 

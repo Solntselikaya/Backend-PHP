@@ -51,16 +51,17 @@ class DishPagedListDto extends BasicDto {
             exit;
         }
 
-        $pag = new PageInfoModel(count($requestResult), $params['page']);
-        $this->pagination = $pag->getContents();
-        
-        /*
-        foreach($requestResult as $key => $value) {
-            array_push($this->dishes, (new DishDto($value))->getContents());
-        }
-        */
-
         $currPage = $params['page'];
+        $pag = new PageInfoModel(count($requestResult), $currPage);
+        $this->pagination = $pag->getContents();
+
+        $maxPage = $this->pagination['count']; 
+        if ($maxPage < $currPage) {
+            $response = new Response(400, "Page number is above pages count. Max page is '$maxPage'");
+            setHTTPStatus(400, $response);
+            exit;
+        }
+
         $dishIndex = ($currPage - 1) * self::maxSize;
 
         if ($dishIndex + self::maxSize >= count($requestResult) - 1) {

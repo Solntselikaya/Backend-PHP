@@ -8,6 +8,23 @@ global $UUID_REGEX;
 $UUID_REGEX = "/[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}/";
 
 date_default_timezone_set('Asia/Novosibirsk');
+header('Content-type: application/json');
+
+$dbLink = new mysqli("127.0.0.1", "back_guy", "password", "backend");
+if (!$dbLink) {
+    $response = new Response(404, "DB Connection error: ".mysqli_connect_error());
+    setHTTPStatus(500, $response);
+    exit;
+}
+
+$adress = getAdress();
+$data = getData();
+
+route(
+    $_SERVER['REQUEST_METHOD'],
+    $adress,
+    $data
+);
 
 function getAdress() {
     $url = rtrim(isset($_GET['q']) ? $_GET['q']: '');
@@ -39,22 +56,5 @@ function getData() {
     return $data;
 }
 
-header('Content-type: application/json');
-
-$dbLink = new mysqli("127.0.0.1", "back_guy", "password", "backend");
-if (!$dbLink) {
-    $response = new Response(404, "DB Connection error: ".mysqli_connect_error());
-    setHTTPStatus(500, $response);
-    exit;
-}
-
-$adress = getAdress();
-$data = getData();
-
-route(
-    $_SERVER['REQUEST_METHOD'],
-    $adress,
-    $data
-);
 
 ?>

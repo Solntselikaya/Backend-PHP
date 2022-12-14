@@ -7,7 +7,6 @@ include_once 'order/orderController.php';
 include_once 'helpers/headers.php';
 include_once 'models/Response.php';
 
-// $method - get, post, delete etc.
 function route($method, $url, $data) {
     switch ($url[1]) {
         case 'account':
@@ -25,7 +24,7 @@ function route($method, $url, $data) {
         default:
             $response = new Response(404, "There is no such path as /$url[1]");
             setHTTPStatus(404, $response);
-            break;
+            exit;
     }
 }
 

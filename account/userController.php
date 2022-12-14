@@ -19,7 +19,7 @@ function userResponse($method, $url, $data) {
                 default:
                     $response = new Response(404, "There is no such path as /$url[0]");
                     setHTTPStatus(404, $response);
-                    break;
+                    exit;
             }
             break;
         case 'GET':
@@ -30,7 +30,7 @@ function userResponse($method, $url, $data) {
                 default:
                     $response = new Response(404, "There is no such path as /$url[0]");
                     setHTTPStatus(404, $response);
-                    break;
+                    exit;
             }
             break;
         case 'PUT':
@@ -41,13 +41,13 @@ function userResponse($method, $url, $data) {
                 default:
                 $response = new Response(404, "There is no such path as /$url[0]");
                 setHTTPStatus(404, $response);
-                break;
+                exit;
             }
             break;
         default:
-            $response = new Response(404, "There is no such method as $method");
+            $response = new Response(404, "There is no such method as '$method' for /$url");
             setHTTPStatus(404, $response);
-            break;
+            exit;
     }
 }
 

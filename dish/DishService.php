@@ -25,5 +25,48 @@ class DishService {
         $dish = new DishDto($dishInfo);
         $dish->echoContents();
     }
+
+    public static function isSettingDishRatingAvaliable($dishId) {
+        $userId = getUserIdFromToken();
+
+        $isDishOrdered = $GLOBALS['dbLink']->query(
+            "SELECT dishId FROM userOrderedDishes WHERE userId = '$userId'"
+        )->num_rows;
+
+        if (!$isDishOrdered) {
+            echo json_encode(false);
+        }
+        else {
+            echo json_encode(true);
+        }
+
+        setHTTPStatus(200);
+    }
+
+    public static function setDishRating($dishId, $ratingScore) {
+        $userId = getUserIdFromToken();
+
+        $isDishOrdered = $GLOBALS['dbLink']->query(
+            "SELECT dishId FROM userOrderedDishes WHERE userId = '$userId'"
+        )->num_rows;
+
+        if (!$isDishOrdered) {
+            $response = new Response(403, "User with id: '$userId' haven't ordered dish with id: '$dishId'");
+            setHTTPStatus(403, $response);
+        }
+
+        $ratingScore = intval($ratingScore);
+        $GLOBALS['dbLink']->query(
+            "INSERT INTO dishesRating (userId, dishId, rating)
+            VALUES (
+                '$userId',
+                '$dishId',
+                '$ratingScore'
+            )
+            ON DUPLICATE KEY UPDATE rating = '$ratingScore'"
+        );
+
+        setHTTPStatus(200);
+    }
 }
 ?>

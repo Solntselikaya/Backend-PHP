@@ -13,16 +13,29 @@ class LoginCredentials {
     }
 
     private function setEmail($email) {
+        if (empty($email)) {
+            $response = new Response(400,"The Email field is required");
+            setHTTPStatus(400, $response);
+            exit;
+        }
+
         $emailExists = $GLOBALS['dbLink']->query("SELECT email FROM users WHERE email = '$email'")->fetch_assoc();
         if (is_null($emailExists)) {
             $response = new Response(400,"No user with email '$email'");
             setHTTPStatus(400, $response);
             exit;
         }
+
         $this->email = $email;
     }
 
     private function setPassword($password) {
+        if (empty($password)) {
+            $response = new Response(400,"The Password field is required");
+            setHTTPStatus(400, $response);
+            exit;
+        }
+
         $password = hash('sha1', $password);
         $passwordExists = $GLOBALS['dbLink']->query("SELECT password FROM users WHERE email = '$this->email'")->fetch_assoc();
         if (is_null($passwordExists)) {
