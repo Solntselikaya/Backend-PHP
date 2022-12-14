@@ -25,6 +25,13 @@ function basketResponse($method, $url, $data) {
                 setHTTPStatus(404, $response);
                 exit;
             }
+
+            if (empty($data->params['increase'])) {
+                $response = new Response(400, "Increase parameter isn't assigned");
+                setHTTPStatus(400, $response);
+                exit;
+            }
+
             $isIncreased = filter_var($data->params['increase'], FILTER_VALIDATE_BOOLEAN);
             switch($isIncreased) {
                 case true:
