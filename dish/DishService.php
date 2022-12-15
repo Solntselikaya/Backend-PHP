@@ -73,7 +73,8 @@ class DishService {
             ON DUPLICATE KEY UPDATE rating = '$ratingScore'"
         );
 
-        setHTTPStatus(200);
+        $response = new Response(null, "Rating succesfully posted");
+        setHTTPStatus(200, $response);
     }
 }
 ?>
